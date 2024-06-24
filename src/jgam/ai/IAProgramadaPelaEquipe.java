@@ -7,7 +7,7 @@ import jgam.game.PossibleMoves;
 import jgam.game.SingleMove;
 
 public class IAProgramadaPelaEquipe implements AI {
-    private int profundidadeMax = 2;
+    private final int profundidadeMax = 1;
     
     public void init() throws Exception {
     }
@@ -23,9 +23,9 @@ public class IAProgramadaPelaEquipe implements AI {
         return "IA programada pela equipe";
     }
     
-    private int earlyThreshold = 240;
+    private final int earlyThreshold = 240;
     
-    private int[] weightMapEarly = {
+    private final int[] weightMapEarly = {
             0,
             0,50,50,50,50,50,
             50,50,40,35,35,35,
@@ -33,7 +33,7 @@ public class IAProgramadaPelaEquipe implements AI {
             0,0,0,0,0,0,
             0};
     
-    private int[] weightMapEnd = {
+    private final int[] weightMapEnd = {
             0,
             0,0,0,0,0,0,
             0,5,10,15,20,25,
@@ -57,25 +57,27 @@ public class IAProgramadaPelaEquipe implements AI {
             int p1Checkers = bs.getPoint(player1, i);
             int p2Checkers = bs.getPoint(player2, i);
             
-            if (p1IsEarly)
-                evaluation += p1Checkers * weightMapEarly[i];
-            else
-                evaluation += p1Checkers * weightMapEnd[i];
+            evaluation += (p1IsEarly) ?
+                    p1Checkers * weightMapEarly[i] :
+                    p1Checkers * weightMapEnd[i];
             
-            if (p2IsEarly)
-                evaluation -= p2Checkers * weightMapEarly[25-i];
-            else
-                evaluation -= p2Checkers * weightMapEnd[25-i];
+            evaluation -= (p2IsEarly) ?
+                    p2Checkers * weightMapEarly[25-i] :
+                    p2Checkers * weightMapEnd[25-i];
             
             if (p1Checkers == 1)
                 evaluation -= 5*i;
-            else if (p1Checkers >= 3)
-                evaluation -= 50 * (p1Checkers - 2);
+            else if (p1Checkers == 2)
+                evaluation += 50;
+            else
+                evaluation -= 75 * (p1Checkers - 2);
             
             if (p2Checkers == 1)
                 evaluation += 5*(25-i);
-            else if (p2Checkers >= 3)
-                evaluation += 50 * (p2Checkers - 2);
+            else if (p2Checkers == 2)
+                evaluation -= 50;
+            else
+                evaluation += 75 * (p2Checkers - 2);
         }
         return evaluation;
     }
