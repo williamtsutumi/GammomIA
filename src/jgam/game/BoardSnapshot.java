@@ -64,10 +64,11 @@ final public class BoardSnapshot extends ArrayBoardSetup {
     private BoardSnapshot(String initial) {
         super();
         if (initial == null) {
-            checkers1[24] = checkers2[24] = 2;
-            checkers1[13] = checkers2[13] = 5;
-            checkers1[8] = checkers2[8] = 3;
-            checkers1[6] = checkers2[6] = 5;
+            checkers1[24] = checkers2[24] = 2; // 1 * 2 = 2
+            checkers1[13] = checkers2[13] = 5; // 11 * 5 = 55
+            checkers1[8] = checkers2[8] = 3; // 16 * 3 = 48
+            checkers1[6] = checkers2[6] = 5; // 18 * 5 = 90 -> 195
+            // 18 * 15 = 270
         } else {
             initial = initial.toLowerCase();
             for (int i = 0; i < 26; i++) {
