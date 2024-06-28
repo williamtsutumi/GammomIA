@@ -64,6 +64,8 @@ public interface AI {
     public static final int DROP = 0;
     public static final int TAKE = 1;
 
+    
+    
     /**
      * given a board make decide which moves to make.
      * There may not be any dice values left after call to this function.

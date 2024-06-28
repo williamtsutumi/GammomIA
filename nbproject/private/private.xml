@@ -3,11 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Projetos/4ano/ia/JGammon_AI_2017/src/jgam/game/BoardSnapshot.java</file>
-            <file>file:/C:/Projetos/4ano/ia/JGammon_AI_2017/src/jgam/ai/Aggressive_AI.java</file>
-            <file>file:/C:/Projetos/4ano/ia/JGammon_AI_2017/src/jgam/game/SingleMove.java</file>
+            <file>file:/C:/Projetos/4ano/ia/JGammon_AI_2017/src/jgam/ai/RolloutAI.java</file>
+            <file>file:/C:/Projetos/4ano/ia/JGammon_AI_2017/src/jgam/ai/AIPlayer.java</file>
+            <file>file:/C:/Projetos/4ano/ia/JGammon_AI_2017/src/jgam/ai/InitialAI.java</file>
             <file>file:/C:/Projetos/4ano/ia/JGammon_AI_2017/src/jgam/ai/IAProgramadaPelaEquipe.java</file>
-            <file>file:/C:/Projetos/4ano/ia/JGammon_AI_2017/src/jgam/game/PossibleMoves.java</file>
+            <file>file:/C:/Projetos/4ano/ia/JGammon_AI_2017/src/jgam/ai/EvaluatingAI.java</file>
         </group>
     </open-files>
 </project-private>

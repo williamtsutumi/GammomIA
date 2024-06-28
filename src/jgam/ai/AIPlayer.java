@@ -116,6 +116,17 @@ public class AIPlayer extends Player {
      */
     private void mymoves() throws CannotDecideException {
         if (game.getGameBoard().canMove()) {
+            if (ai instanceof IAProgramadaPelaEquipe){
+//                IAProgramadaPelaEquipe iaProg = (IAProgramadaPelaEquipe)ai;
+//                System.out.println("heuristic:" + iaProg.heuristics(game.getGameBoard()));
+//                try{
+//                    System.in.read();
+//                }
+//                catch (Exception e) {
+//                    System.out.println("");
+//                }
+            }
+            
             SingleMove moves[] = ai.makeMoves(game.getGameBoard());
             if (ai instanceof EvaluatingAI) {
                 double eval = ((EvaluatingAI) ai).propabilityToWin(game.getGameBoard());

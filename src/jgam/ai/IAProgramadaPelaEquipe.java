@@ -7,7 +7,7 @@ import jgam.game.PossibleMoves;
 import jgam.game.SingleMove;
 
 public class IAProgramadaPelaEquipe implements AI {
-    private final int profundidadeMax = 1;
+    private final int profundidadeMax = 2;
     
     public void init() throws Exception {
     }
@@ -23,12 +23,12 @@ public class IAProgramadaPelaEquipe implements AI {
         return "IA programada pela equipe";
     }
     
-    private final int earlyThreshold = 240;
+    private final int earlyThreshold = 260;
     
     private final int[] weightMapEarly = {
             0,
-            0,50,50,50,50,50,
-            50,50,40,35,35,35,
+            -50,-30,-20,0,10,20,
+            20,20,20,20,25,30,
             30,25,25,25,20,0,
             0,0,0,0,0,0,
             0};
@@ -38,75 +38,60 @@ public class IAProgramadaPelaEquipe implements AI {
             0,0,0,0,0,0,
             0,5,10,15,20,25,
             30,35,40,40,40,40,
-            35,35,25,25,25,25,
+            40,40,40,40,40,40,
             100};
     
-    private double heuristic(BoardSetup bs) {
-        double evaluation = 0;
+    public Double heuristics(BoardSetup bs) {
+        Double evaluation = 0.0;
         
         int player1 = 1;
         int player2 = 2;
-        boolean p1IsEarly = false;
-        boolean p2IsEarly = false;
-        
-        for (int i = 0; i <= 6; i++) {
-            if (bs.getPoint(player1, i) > 0) p1IsEarly = true;
-            if (bs.getPoint(player2, i) > 0) p2IsEarly = true;
-        }
-        for (int i = 0; i <= 25; i++) {
+        for (int i = 1; i <= 25; i++) {
             int p1Checkers = bs.getPoint(player1, i);
             int p2Checkers = bs.getPoint(player2, i);
             
-            evaluation += (p1IsEarly) ?
-                    p1Checkers * weightMapEarly[i] :
-                    p1Checkers * weightMapEnd[i];
-            
-            evaluation -= (p2IsEarly) ?
-                    p2Checkers * weightMapEarly[25-i] :
-                    p2Checkers * weightMapEnd[25-i];
+            evaluation += p1Checkers * 5.0*Integer.min(12, 25-i);
+            evaluation -= p2Checkers * 5.0*Integer.min(12, 25-i);
             
             if (p1Checkers == 1)
-                evaluation -= 5*i;
+                evaluation -= 10.0;
             else if (p1Checkers == 2)
-                evaluation += 50;
-            else
-                evaluation -= 75 * (p1Checkers - 2);
+                evaluation += 10.0;
+            else if (p1Checkers > 2)
+                evaluation -= 10.0 * (p1Checkers - 2);
             
             if (p2Checkers == 1)
-                evaluation += 5*(25-i);
+                evaluation += 10.0;
             else if (p2Checkers == 2)
-                evaluation -= 50;
-            else
-                evaluation += 75 * (p2Checkers - 2);
+                evaluation -= 10.0;
+            else if (p2Checkers > 2)
+                evaluation += 10.0 * (p2Checkers - 2);
         }
+        evaluation += 200.0 * bs.getPoint(player1, 0);
+        evaluation -= 200.0 * bs.getPoint(player2, 0);
+
         return evaluation;
     }
 
     public SingleMove[] makeMoves(BoardSetup bs) throws CannotDecideException {
         if (bs.getActivePlayer() == 2)
-            return miniMax(bs,
-                    MoveType.MIN,
-                    (double)0,
-                    Double.NEGATIVE_INFINITY,
-                    Double.POSITIVE_INFINITY).second;
-        else
-            return miniMax(bs,
-                    MoveType.MAX,
-                    (double)0,
-                    Double.NEGATIVE_INFINITY,
-                    Double.POSITIVE_INFINITY).second;
+            return miniMax(bs, MoveType.MIN, 0).second;
+        else {
+            Pair<Double, SingleMove[]> out = miniMax(bs, MoveType.MAX, 0);
+            System.out.println("Heuristica escolhida: " + out.first);
+            return out.second;
+        }
+            
     }
     
     private Pair<Double, SingleMove[]> valorMax(
             BoardSetup bs,
-            double profundidade,
-            double alpha,
-            double beta
+            int profundidade
     ){
         if (profundidade == profundidadeMax)
-            return new Pair((double)heuristic(bs), null);
+            return new Pair(heuristics(bs), null);
         
-        double max = Double.NEGATIVE_INFINITY;
+        Double max = Double.NEGATIVE_INFINITY;
         
         PossibleMoves pm = new PossibleMoves(bs);
         List moveList = pm.getPossbibleNextSetups();
@@ -116,17 +101,10 @@ public class IAProgramadaPelaEquipe implements AI {
         for (Iterator iter = moveList.iterator(); iter.hasNext(); i++) {
             BoardSetup boardSetup = (BoardSetup) iter.next();
             
-            double opponentEval = miniMax(
+            Double opponentEval = miniMax(
                     boardSetup,
                     MoveType.CHANCE_TO_MIN,
-                    profundidade + 1,
-                    alpha,
-                    beta).first;
-            
-            if (opponentEval >= beta)
-                return new Pair(max, pm.getMoveChain(i));
-            
-            alpha = Double.max(alpha, max);
+                    profundidade + 1).first;
             
             if (opponentEval > max) {
                 max = opponentEval;
@@ -141,14 +119,12 @@ public class IAProgramadaPelaEquipe implements AI {
     
     private Pair<Double, SingleMove[]> valorMin(
             BoardSetup bs,
-            double profundidade,
-            double alpha,
-            double beta
+            int profundidade
     ){
         if (profundidade == profundidadeMax)
-            return new Pair((double)heuristic(bs), null);
+            return new Pair(heuristics(bs), null);
         
-        double min = Double.POSITIVE_INFINITY;
+        Double min = Double.POSITIVE_INFINITY;
         
         PossibleMoves pm = new PossibleMoves(bs);
         List moveList = pm.getPossbibleNextSetups();
@@ -158,16 +134,10 @@ public class IAProgramadaPelaEquipe implements AI {
         for (Iterator iter = moveList.iterator(); iter.hasNext(); i++) {
             BoardSetup boardSetup = (BoardSetup) iter.next();
         
-            double opponentEval = miniMax(
+            Double opponentEval = miniMax(
                     boardSetup,
                     MoveType.CHANCE_TO_MAX,
-                    profundidade + 1,
-                    alpha,
-                    beta).first;
-            if (opponentEval <= alpha)
-                return new Pair(min, pm.getMoveChain(i));
-            
-            beta = Double.min(beta, min);
+                    profundidade + 1).first;
             
             if (opponentEval < min){
                 min = opponentEval;
@@ -183,15 +153,13 @@ public class IAProgramadaPelaEquipe implements AI {
     private Pair<Double, SingleMove[]> valorChance(
             BoardSetup bs,
             MoveType nextType,
-            double profundidade,
-            double alpha,
-            double beta
+            int profundidade
     ){
-        double output = 0;
+        Double output = 0.0;
         
         for (int i = 0; i <= 6; i++) {
             for (int j = i; j <= 6; j++) {
-                double probability = (i == j) ? 1/36 : 1/18;
+                double probability = (i == j) ? 1.0/36.0 : 1.0/18.0;
                 
                 int[] dices = {i, j};
                 PossibleMoves pm = new PossibleMoves(bs, dices);
@@ -203,9 +171,7 @@ public class IAProgramadaPelaEquipe implements AI {
                     double opponentEval = miniMax(
                             boardSetup,
                             nextType,
-                            profundidade,
-                            alpha,
-                            beta).first;
+                            profundidade + 1).first;
                     
                     output += probability * opponentEval;
                 }
@@ -218,18 +184,16 @@ public class IAProgramadaPelaEquipe implements AI {
     private Pair<Double, SingleMove[]> miniMax(
             BoardSetup bs,
             MoveType type,
-            double profundidade,
-            double alpha,
-            double beta
+            int profundidade
     ){
         if (type == MoveType.MIN)
-            return valorMin(bs, profundidade, alpha, beta);
+            return valorMin(bs, profundidade);
         else if (type == MoveType.MAX)
-            return valorMax(bs, profundidade, alpha, beta);
+            return valorMax(bs, profundidade);
         else if (type == MoveType.CHANCE_TO_MAX)
-            return valorChance(bs, MoveType.MAX, profundidade, alpha, beta);
+            return valorChance(bs, MoveType.MAX, profundidade);
         else
-            return valorChance(bs, MoveType.MIN, profundidade, alpha, beta);
+            return valorChance(bs, MoveType.MIN, profundidade);
     }
 
     public int rollOrDouble(BoardSetup boardSetup) throws CannotDecideException {
